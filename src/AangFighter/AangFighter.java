@@ -12,7 +12,7 @@ import java.awt.*;
 public class AangFighter extends PollingScript<ClientContext> implements PaintListener {
 
     public enum State{
-        attacking, burying, eating;
+        attacking, burying, eating
     }
 
     //TODO set running if has energy
@@ -92,8 +92,11 @@ public class AangFighter extends PollingScript<ClientContext> implements PaintLi
         System.out.println("Script Started!");
     }
 
+    //TODO add check if target is under attack by someone else
+    //TODO check if there is a target which is closer than the current one
+
     @Override
-    public void poll() { //TODO add check if target is under attack by someone else
+    public void poll() {
         if( !ctx.movement.running() && ctx.movement.energyLevel() >= 75) {
             ctx.movement.running(true);
         }
@@ -109,10 +112,10 @@ public class AangFighter extends PollingScript<ClientContext> implements PaintLi
                     }
                 } else {
                     target = getNextTarget();
-                    if( !target.inViewport()) {
-                        if( target.tile().matrix(ctx).onMap() )
-                            ctx.input.click(target.tile().matrix(ctx).mapPoint(),true);
-                    }else
+                    if( !target.inViewport())
+                        if (target.tile().matrix(ctx).onMap())
+                            ctx.input.click(target.tile().matrix(ctx).mapPoint(), true);
+                    else
                         target.interact("Attack", target.name());
                 }
             }
