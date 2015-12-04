@@ -23,8 +23,7 @@ public class AangFighter extends PollingScript<ClientContext> implements PaintLi
     private GroundItem targetBone;
     private State state = State.attacking;
 
-    private boolean isAttacking()
-    {
+    private boolean isAttacking() {
         return ctx.players.local().interacting().valid() || (ctx.players.local().interacting().valid() && target != null && target.valid() && target.health() != 0);
     }
 
@@ -33,8 +32,7 @@ public class AangFighter extends PollingScript<ClientContext> implements PaintLi
         return ctx.inventory.select().count() == 28;
     }
 
-    private void checkIfBeingAttacked()
-    {
+    private void checkIfBeingAttacked() {
         if(ctx.players.local().inCombat() && !ctx.players.local().interacting().valid()) {
             for (Npc npc : ctx.npcs.get() ) {
                 if( npc.interacting().valid()) {
@@ -49,8 +47,7 @@ public class AangFighter extends PollingScript<ClientContext> implements PaintLi
         }
     }
 
-    private Npc getNextTarget()
-    {
+    private Npc getNextTarget() {
         final Filter<Npc> filter = new Filter<Npc>()
         {
             public boolean accept(Npc npc) {
@@ -68,8 +65,7 @@ public class AangFighter extends PollingScript<ClientContext> implements PaintLi
         return ret;
     }
 
-    private GroundItem getNextGroundBone()
-    {
+    private GroundItem getNextGroundBone() {
         return ctx.groundItems.select().id(bones).select(new Filter<GroundItem>() {
             @Override
             public boolean accept(GroundItem groundItem) {
@@ -83,11 +79,6 @@ public class AangFighter extends PollingScript<ClientContext> implements PaintLi
 
         if(target != null && target.valid())
             target.draw(g,100);
-        g.drawString(""+inventoryFull(),0,100);
-        g.drawString(""+ctx.inventory.select().count(),0,110);
-
-        Point p = target.tile().matrix(ctx).mapPoint();
-        g.fillRect(p.x-2,p.y-2,4,4);
 
         g.setColor(Color.white);
         g.drawLine(0,ctx.input.getLocation().y, ctx.input.getLocation().x - 5,ctx.input.getLocation().y );
@@ -103,8 +94,6 @@ public class AangFighter extends PollingScript<ClientContext> implements PaintLi
 
     @Override
     public void poll() { //TODO add check if target is under attack by someone else
-        //if( ctx.players.local().interacting().valid() )
-        //    target = (Npc)ctx.players.local().interacting();
         if( !ctx.movement.running() && ctx.movement.energyLevel() >= 75) {
             ctx.movement.running(true);
         }
