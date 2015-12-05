@@ -1,21 +1,19 @@
 package AangFighter;
 
-import org.powerbot.script.Filter;
-import org.powerbot.script.PaintListener;
-import org.powerbot.script.PollingScript;
-import org.powerbot.script.Script;
+import org.powerbot.script.*;
 import org.powerbot.script.rt4.*;
+import org.powerbot.script.rt4.ClientContext;
 
 import java.awt.*;
 
 @Script.Manifest(name = "AangFighter", description = "Fights shit", properties="client=4")
-public class AangFighter extends PollingScript<ClientContext> implements PaintListener {
+public class AangFighter extends PollingScript<ClientContext> implements PaintListener, MessageListener {
 
     public enum State{
         attacking, burying, eating
     }
 
-    //TODO set running if has energy
+    private int prayerLevels = 0, attackLevels = 0, strengthLevels = 0, defenseLevels = 0, hpLevels = 0, rangeLevels = 0;
 
     private final int[] monsterIDs = Monster.cows.ids;
     private final int bones = 526;
@@ -94,6 +92,7 @@ public class AangFighter extends PollingScript<ClientContext> implements PaintLi
 
     //TODO add check if target is under attack by someone else
     //TODO check if there is a target which is closer than the current one
+    //Congratulations, you just advanced a Prayer level.
 
     @Override
     public void poll() {
@@ -129,4 +128,25 @@ public class AangFighter extends PollingScript<ClientContext> implements PaintLi
     public void stop() {
         System.out.println("Script Stopped!");
     }
+
+    @Override
+    public void messaged(MessageEvent messageEvent) {
+        if(messageEvent.type() == 0) {
+            if( messageEvent.text().equals("Congratulations, you just advanced a Prayer level."))
+                prayerLevels++;
+            else if( messageEvent.text().equals("Congratulations, you just advanced a Attack level."))
+                attackLevels++;
+            else if( messageEvent.text().equals("Congratulations, you just advanced a Strength level."))
+                strengthLevels++;
+            else if( messageEvent.text().equals("Congratulations, you just advanced a Defense level."))
+                defenseLevels++;
+            else if( messageEvent.text().equals("Congratulations, you just advanced a Hitpoints level."))
+                hpLevels++;
+            else if( messageEvent.text().equals("Congratulations, you just advanced a Ranged level."))
+                rangeLevels++;
+        }
+        System.out.println("Source: "+messageEvent.source());
+        System.out.println("Type: "+messageEvent.type());
+    }
+
 }
