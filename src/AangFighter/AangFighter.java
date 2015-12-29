@@ -1,14 +1,15 @@
 package AangFighter;
 
-import AngUtilFunc.UtilFunc;
+import AangUtil.AangScript;
 import org.powerbot.script.*;
 import org.powerbot.script.rt4.*;
-import org.powerbot.script.rt4.ClientContext;
 
 import java.awt.*;
+import java.util.*;
+import java.util.List;
 
 @Script.Manifest(name = "AangFighter", description = "Fights shit", properties="client=4")
-public class AangFighter extends PollingScript<ClientContext> implements PaintListener, MessageListener {
+public class AangFighter extends AangScript implements PaintListener, MessageListener {
 
     private enum State{
         attacking, burying, eating
@@ -18,11 +19,11 @@ public class AangFighter extends PollingScript<ClientContext> implements PaintLi
         melee, ranged, magic
     }
 
-    private UtilFunc UF = UtilFunc.getInstance();
     private int prayerLevels = 0, attackLevels = 0, strengthLevels = 0, defenseLevels = 0, hpLevels = 0, rangeLevels = 0;
 
     private final int[] monsterIDs = Monster.cows.ids;
-    private int[] itemsToLoot;
+    private List<Integer> itemsToLoot = new ArrayList<Integer>();
+    private int[] lootIDs;
     private final int bones = 526;
     private Npc target;
     private GroundItem targetBone;
@@ -30,9 +31,10 @@ public class AangFighter extends PollingScript<ClientContext> implements PaintLi
     private boolean buryBones = true;
     private boolean clickedGroundItem = false, clickedMonster = false;
     private String stateText = "";
+    private CombatType combatType = CombatType.ranged;
 
-    private static int bronzeArrow, ironArrow, steelArrow, mithArrow, addyArrow, runeArrow;
-    private int arrowsUsed;
+    private static int bronzeArrow, ironArrow, steelArrow, mithArrow = 888, addyArrow, runeArrow;
+    private int arrowsUsed = mithArrow;
 
     private int[] inventory = new int[28];
 
@@ -78,10 +80,10 @@ public class AangFighter extends PollingScript<ClientContext> implements PaintLi
     }
 
     private GroundItem getNextGroundBone() {
-        return ctx.groundItems.select().id(bones).select(new Filter<GroundItem>() {
+        return ctx.groundItems.select().id(lootIDs).select(new Filter<GroundItem>() {
             @Override
             public boolean accept(GroundItem groundItem) {
-                return UtilFunc.instance.pointOnScreen(groundItem.centerPoint());
+                return misc.pointOnScreen(groundItem.centerPoint());
             }
         }).nearest().poll();
     }
@@ -122,12 +124,14 @@ public class AangFighter extends PollingScript<ClientContext> implements PaintLi
             buryBones = false;
             System.out.println("Pray level 43");
         }
-        UF.init(ctx);
+
+        lootIDs = new int[]{buryBones ? bones : 0,combatType == CombatType.ranged ? arrowsUsed : 0};
+
+        System.out.println("loot ID's: " + lootIDs[1]);
 
         while( ctx.game.tab() != Game.Tab.INVENTORY ) {
-            UF.openInventory();
+            misc.openInventory();
         }
-
     }
 
     /*
@@ -167,26 +171,26 @@ public class AangFighter extends PollingScript<ClientContext> implements PaintLi
             stateText = "";
             if( isAttacking() ) {
                 stateText = "Attacking";
-            } else {
-                if (!inventoryFull() && buryBones && (targetBone == null || !targetBone.valid() || !UF.pointOnScreen(targetBone.centerPoint())) ) {
+            } else {//TODO find out why it stops picking up arrows after some time
+                if (!inventoryFull() && (targetBone == null || !targetBone.valid() || !misc.pointOnScreen(targetBone.centerPoint())) ) {
                     targetBone = getNextGroundBone();
                     clickedGroundItem = false;
                 }
-                if (!inventoryFull() && targetBone != null && targetBone.valid() && !inventoryFull() && UF.pointOnScreen(targetBone.centerPoint())) {
+                if (!inventoryFull() && targetBone != null && targetBone.valid() && !inventoryFull() && misc.pointOnScreen(targetBone.centerPoint())) {
                     stateText = "Picking up bones";
                     if( !ctx.players.local().inMotion() )
                         clickedGroundItem = false;
                     if (!clickedGroundItem ) {
-                        clickedGroundItem = UF.interact.pickupGroundItem(targetBone);
+                        clickedGroundItem = interact.pickupGroundItem(targetBone);
                     }
-                } else  if( inventoryFull() && buryBones && ctx.inventory.select().id(bones).first().poll().valid() ) {
+                } else  if( inventoryFull() && ctx.inventory.select().id(bones).first().poll().valid() ) {
                     state = State.burying;
                 } else {
                     if( !clickedMonster || !target.valid() || target.health() <= 0 || target.interacting() != ctx.players.local() ) {
                         target = getNextTarget();
                         clickedMonster = false;
                     }
-                    if (!UF.pointOnScreen(target.centerPoint())) {
+                    if (!misc.pointOnScreen(target.centerPoint())) {
                         if (target.tile().matrix(ctx).onMap()) {
                             stateText = "Walking to monster";
                             ctx.input.click(target.tile().matrix(ctx).mapPoint(), true);
@@ -194,15 +198,15 @@ public class AangFighter extends PollingScript<ClientContext> implements PaintLi
                     } else {
                         stateText = "Attacking monster";
                         if( !clickedMonster )
-                            clickedMonster = UF.interact.attackNPC(target);
+                            clickedMonster = interact.attackMonster(target);
                     }
                 }
             }
         }else if( state == State.burying){
             Item invBones = ctx.inventory.select().id(bones).first().poll();
-            if( invBones.valid() && buryBones) {
+            if( invBones.valid()) {
                 stateText = "Clicking bones";
-                UF.interact.clickInvItem(invBones);
+                interact.clickInvItem(invBones);
             }else {
                 state = State.attacking;
             }
@@ -232,8 +236,10 @@ public class AangFighter extends PollingScript<ClientContext> implements PaintLi
                 rangeLevels++;
         }
 
-        if( ctx.skills.realLevel(5) >= 43 )
+        if( ctx.skills.realLevel(5) >= 43 ) {
             buryBones = false;
+            lootIDs[1] = 0;
+        }
     }
 
 }

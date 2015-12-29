@@ -105,12 +105,7 @@ public class AreaMaker extends PollingScript<ClientContext> implements PaintList
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         clipboard.setContents(new StringSelection(text), null);
 
-        Tile[] t = new Tile[tiles.size()];
-        tiles.toArray(t);
-        Area a = new Area(t);
-        System.out.println(a.getPolygon().npoints);
-        for( int i = 0; i < a.getPolygon().npoints; i++ )
-            System.out.println(a.getPolygon().xpoints[i] + ", " + a.getPolygon().ypoints[i]);
+        System.out.println(text);
     }
 
     public void exit(){

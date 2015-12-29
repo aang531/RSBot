@@ -1,4 +1,4 @@
-package AngUtilFunc;
+package AangUtil;
 
 import org.powerbot.script.rt4.ClientContext;
 
@@ -9,27 +9,17 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 
-public class UtilFunc {
-    private static ClientContext ctx;
-    private static UtilFunc ourInstance = new UtilFunc();
+public class MiscFunc {
+    private ClientContext ctx;
+    private static MiscFunc ourInstance = new MiscFunc();
 
-    public static UtilFunc getInstance() {
+    public static MiscFunc getInstance() {
         return ourInstance;
     }
 
-    public static UtilFunc instance = getInstance();
-
-    private UtilFunc() {
-    }
-
-    public void init(ClientContext ctx)
-    {
+    public void init(ClientContext ctx) {
         this.ctx = ctx;
-        interact = InteractFunc.getInstance();
-        interact.init(ctx);
     }
-
-    public InteractFunc interact;
 
     public int getGEPrice(int id){
         try {
@@ -50,8 +40,12 @@ public class UtilFunc {
         return 0;
     }
 
-    public boolean pointOnScreen( Point p ){
+    public boolean pointOnScreen(Point p){
         return p.x > 0 && p.y > 0 && p.x < 516 && p.y < 338;
+    }
+
+    public boolean inventoryFull() {
+        return ctx.inventory.select().count() == 28;
     }
 
     public int getMenuOptionIndex(String action, String option){

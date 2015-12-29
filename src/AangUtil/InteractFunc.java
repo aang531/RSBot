@@ -1,7 +1,6 @@
-package AngUtilFunc;
+package AangUtil;
 
-import org.powerbot.script.Filter;
-import org.powerbot.script.MenuCommand;
+import org.powerbot.script.Condition;
 import org.powerbot.script.rt4.ClientContext;
 import org.powerbot.script.rt4.GroundItem;
 import org.powerbot.script.rt4.Item;
@@ -15,9 +14,6 @@ public class InteractFunc {
 
     public static InteractFunc getInstance() {
         return ourInstance;
-    }
-
-    private InteractFunc() {
     }
 
     public void init(ClientContext ctx)
@@ -35,8 +31,8 @@ public class InteractFunc {
     }
 
     public boolean pickupGroundItem( final GroundItem gi ) {
-        while( gi.valid() && UtilFunc.instance.pointOnScreen(gi.centerPoint()) ) {
-            int index = UtilFunc.instance.getMenuOptionIndex("Take", gi.name());
+        while( gi.valid() && MiscFunc.getInstance().pointOnScreen(gi.centerPoint()) ) {
+            int index = MiscFunc.getInstance().getMenuOptionIndex("Take", gi.name());
             if( !ctx.menu.opened() ) {
                 ctx.input.move(gi.centerPoint());
                 if (index == 0) {
@@ -57,8 +53,8 @@ public class InteractFunc {
     }
 
     public boolean clickGroundItem( GroundItem gi, String action, String option) {
-        while( gi.valid() && UtilFunc.instance.pointOnScreen(gi.centerPoint()) ) {
-            int index = UtilFunc.instance.getMenuOptionIndex(action, option);
+        while( gi.valid() && MiscFunc.getInstance().pointOnScreen(gi.centerPoint()) ) {
+            int index = MiscFunc.getInstance().getMenuOptionIndex(action, option);
             if( !ctx.menu.opened() ) {
                 ctx.input.move(gi.centerPoint());
                 if (index == 0) {
@@ -78,11 +74,59 @@ public class InteractFunc {
         return false;
     }
 
-    public boolean attackNPC( final Npc npc ) {
-        while( npc.valid() && UtilFunc.instance.pointOnScreen(npc.centerPoint())){
-            int index = UtilFunc.instance.getMenuOptionIndex("Attack",npc.name() + "  (level-" + npc.combatLevel() + ")");
+    public boolean attackMonster( final Npc npc ) {
+        while( npc.valid() && MiscFunc.getInstance().pointOnScreen(npc.centerPoint())){
+            int index = MiscFunc.getInstance().getMenuOptionIndex("Attack",npc.name() + "  (level-" + npc.combatLevel() + ")");
             if( !ctx.menu.opened()) {
                 ctx.input.move(npc.centerPoint());
+                Condition.sleep(30);
+                index = MiscFunc.getInstance().getMenuOptionIndex("Attack",npc.name() + "  (level-" + npc.combatLevel() + ")");
+                if( index == 0 ){
+                    return ctx.input.click(true);
+                }else{
+                    ctx.input.click(false);
+                }
+            }else{
+                if( index != -1)
+                    return clickMenuOption(index);
+                else
+                    ctx.menu.close();
+                return false;
+            }
+        }
+        return false;
+    }
+
+    public boolean interactNPC( final Npc npc, String action ) {
+        while( npc.valid() && MiscFunc.getInstance().pointOnScreen(npc.centerPoint())){
+            int index = MiscFunc.getInstance().getMenuOptionIndex(action,npc.name() + (npc.combatLevel() != 0 ? "  (level-" + npc.combatLevel() + ")" : ""));
+            if( !ctx.menu.opened()) {
+                ctx.input.move(npc.centerPoint());
+                Condition.sleep(30);
+                index = MiscFunc.getInstance().getMenuOptionIndex(action,npc.name() + (npc.combatLevel() != 01 ? "  (level-" + npc.combatLevel() + ")" : ""));
+                if( index == 0 ){
+                    return ctx.input.click(true);
+                }else{
+                    ctx.input.click(false);
+                }
+            }else{
+                if( index != -1)
+                    return clickMenuOption(index);
+                else
+                    ctx.menu.close();
+                return false;
+            }
+        }
+        return false;
+    }
+
+    public boolean useItemOnNpc( final Npc npc) {
+        while( npc.valid() && MiscFunc.getInstance().pointOnScreen(npc.centerPoint())){
+            int index = MiscFunc.getInstance().getMenuOptionIndex("Use", ctx.inventory.selectedItem().name() + " -> " + npc.name() + (npc.combatLevel() != 0 ? "  (level-" + npc.combatLevel() + ")" : ""));
+            if( !ctx.menu.opened()) {
+                ctx.input.hop(npc.centerPoint());
+                Condition.sleep(30);
+                index = MiscFunc.getInstance().getMenuOptionIndex("Use",ctx.inventory.selectedItem().name() + " -> " + npc.name() + (npc.combatLevel() != 0 ? "  (level-" + npc.combatLevel() + ")" : ""));
                 if( index == 0 ){
                     return ctx.input.click(true);
                 }else{
@@ -101,7 +145,7 @@ public class InteractFunc {
 
     public boolean clickInvItem(final Item item, String action ){
         while( item.valid() ) {
-            int index = UtilFunc.instance.getMenuOptionIndex(action, item.name());
+            int index = MiscFunc.getInstance().getMenuOptionIndex(action, item.name());
             if( !ctx.menu.opened()) {
                 ctx.input.move(item.centerPoint());
                 if( index == 0)
@@ -130,7 +174,8 @@ public class InteractFunc {
 
     public boolean clickInvItem( final Item item) {
         if( item.valid() ) {
-            ctx.input.move(item.centerPoint());
+            ctx.input.hop(item.centerPoint());
+            Condition.sleep(50);
             if( ctx.menu.commands()[0].option.equals(item.name()))
                 return ctx.input.click(true);
         }

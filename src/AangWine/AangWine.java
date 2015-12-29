@@ -1,18 +1,16 @@
 package AangWine;
 
-import AngUtilFunc.UtilFunc;
+import AangUtil.AangScript;
 import org.powerbot.script.*;
 import org.powerbot.script.rt4.*;
-import org.powerbot.script.rt4.ClientContext;
 import org.powerbot.script.rt4.Interactive;
 
 import java.awt.*;
 
 @Script.Manifest(name = "AangWine", description = "Telegrabs zammy wine", properties="client=4")
-public class AangWine extends PollingScript<ClientContext> implements PaintListener, MessageListener {
-    private UtilFunc UF = UtilFunc.getInstance();
+public class AangWine extends AangScript implements PaintListener, MessageListener {
 
-    private final int wineID = 245, lawRune = 563, airStaff = 1381, bankID = 24101, waterRune = 555;
+    private static final int wineID = 245, lawRune = 563, airStaff = 1381, bankID = 24101, waterRune = 555;
 
     private int winePrice = 0, lawPrice = 0, waterRunePrice = 0;
 
@@ -109,18 +107,17 @@ public class AangWine extends PollingScript<ClientContext> implements PaintListe
     @Override
     public void start() {
         System.out.println("Script Started!");
-        UF.init(ctx);
 
         while(ctx.game.tab() != Game.Tab.INVENTORY)
-            UF.openInventory();
+            misc.openInventory();
         itemsInInv = ctx.inventory.select().count();
         System.out.println(itemsInInv);
 
         Thread tmp = new Thread() {
             public void run() {
-                winePrice = UF.getGEPrice(wineID);
-                lawPrice = UF.getGEPrice(lawRune);
-                waterRunePrice = UF.getGEPrice(waterRune);
+                winePrice = misc.getGEPrice(wineID);
+                lawPrice = misc.getGEPrice(lawRune);
+                waterRunePrice = misc.getGEPrice(waterRune);
             }
         };
 
@@ -169,7 +166,7 @@ public class AangWine extends PollingScript<ClientContext> implements PaintListe
             if (itemsInInv == 28) {
                 stopGrabThread();
                 if( !running ) {
-                    UF.openMagicTab();
+                    misc.openMagicTab();
                     if( System.currentTimeMillis() - lastTimeClick > 4000 ) {
                         if (ctx.magic.spell() != null) {
                             ctx.input.hop(0, 0);
