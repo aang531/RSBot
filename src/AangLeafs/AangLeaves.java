@@ -1,6 +1,6 @@
 package AangLeafs;
 
-import AangUtil.AangScript;
+import Util.AangScript;
 import org.powerbot.script.*;
 import org.powerbot.script.rt4.*;
 import org.powerbot.script.rt4.Component;
@@ -99,7 +99,7 @@ public class AangLeaves extends AangScript implements PaintListener, MessageList
                 }
             }
         }else{
-            interact.interactNPC(gardener,"Talk-to");
+            npcs.click(gardener,"Talk-to");
             Condition.sleep(200);
         }
         Condition.sleep(150);
@@ -109,7 +109,7 @@ public class AangLeaves extends AangScript implements PaintListener, MessageList
     public void messaged(MessageEvent messageEvent) {
         if(messageEvent.text().equals("Wyson gives you a pair of woad leaves.")) {
             leavesGained += 2;
-            interact.interactNPC(gardener,"Talk-to");
+            npcs.click(gardener,"Talk-to");
         }
     }
 }

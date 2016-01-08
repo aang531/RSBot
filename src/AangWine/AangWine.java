@@ -1,6 +1,6 @@
 package AangWine;
 
-import AangUtil.AangScript;
+import Util.AangScript;
 import org.powerbot.script.*;
 import org.powerbot.script.rt4.*;
 import org.powerbot.script.rt4.Interactive;

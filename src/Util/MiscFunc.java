@@ -1,6 +1,7 @@
-package AangUtil;
+package Util;
 
-import org.powerbot.script.rt4.ClientContext;
+import org.powerbot.script.Tile;
+import org.powerbot.script.rt4.Component;
 
 import java.awt.*;
 import java.io.BufferedReader;
@@ -9,17 +10,13 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 
-public class MiscFunc {
-    private ClientContext ctx;
+public class MiscFunc extends AangUtil {
     private static MiscFunc ourInstance = new MiscFunc();
 
     public static MiscFunc getInstance() {
         return ourInstance;
     }
 
-    public void init(ClientContext ctx) {
-        this.ctx = ctx;
-    }
 
     public int getGEPrice(int id){
         try {
@@ -41,11 +38,7 @@ public class MiscFunc {
     }
 
     public boolean pointOnScreen(Point p){
-        return p.x > 0 && p.y > 0 && p.x < 516 && p.y < 338;
-    }
-
-    public boolean inventoryFull() {
-        return ctx.inventory.select().count() == 28;
+        return p.x > 3 && p.y > 3 && p.x < 516 && p.y < 338;
     }
 
     public int getMenuOptionIndex(String action, String option){
@@ -55,6 +48,17 @@ public class MiscFunc {
             }
         }
         return -1;
+    }
+
+    public Tile getTileUnderPoint(Point p){
+        Tile playerTile = ctx.players.local().tile();
+        for (int y = -10; y <= 10; y++)
+            for (int x = -10; x <= 10; x++) {
+                if (playerTile.derive(x, y).matrix(ctx).bounds().contains(p)) {
+                    return playerTile.derive(x, y);
+                }
+            }
+        return null;
     }
 
     public void openInventory(){
@@ -89,5 +93,42 @@ public class MiscFunc {
     public void openMagicTab() {
         ctx.input.send("{VK_F6 down}");
         ctx.input.send("{VK_F6 up}");
+    }
+
+    public void openClanTab() {
+        ctx.input.send("{VK_F7 down}");
+        ctx.input.send("{VK_F7 up}");
+    }
+
+    public void openFriendTab() {
+        ctx.input.send("{VK_F8 down}");
+        ctx.input.send("{VK_F8 up}");
+    }
+
+    public void openIgnoreTab() {
+        ctx.input.send("{VK_F9 down}");
+        ctx.input.send("{VK_F9 up}");
+    }
+
+    public void openLogoutTab() {
+        Component c = ctx.widgets.widget(548).component(31);
+        ctx.input.hop(c.centerPoint());
+        AangUtil.sleep(80);
+        ctx.input.click(true);
+    }
+
+    public void openOptionsTab() {
+        ctx.input.send("{VK_F10 down}");
+        ctx.input.send("{VK_F10 up}");
+    }
+
+    public void openEmoteTab() {
+        ctx.input.send("{VK_F11 down}");
+        ctx.input.send("{VK_F11 up}");
+    }
+
+    public void openMusicTab() {
+        ctx.input.send("{VK_F12 down}");
+        ctx.input.send("{VK_F12 up}");
     }
 }

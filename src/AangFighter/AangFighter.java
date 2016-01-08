@@ -1,6 +1,6 @@
 package AangFighter;
 
-import AangUtil.AangScript;
+import Util.AangScript;
 import org.powerbot.script.*;
 import org.powerbot.script.rt4.*;
 
@@ -21,7 +21,7 @@ public class AangFighter extends AangScript implements PaintListener, MessageLis
 
     private int prayerLevels = 0, attackLevels = 0, strengthLevels = 0, defenseLevels = 0, hpLevels = 0, rangeLevels = 0;
 
-    private final int[] monsterIDs = Monster.cows.ids;
+    private final int[] monsterIDs = Monster.chickens.ids;//Monster.cows.ids;
     private List<Integer> itemsToLoot = new ArrayList<Integer>();
     private int[] lootIDs;
     private final int bones = 526;
@@ -34,16 +34,10 @@ public class AangFighter extends AangScript implements PaintListener, MessageLis
     private CombatType combatType = CombatType.ranged;
 
     private static int bronzeArrow, ironArrow, steelArrow, mithArrow = 888, addyArrow, runeArrow;
-    private int arrowsUsed = mithArrow;
-
-    private int[] inventory = new int[28];
+    private int ammoUsed = mithArrow;
 
     private boolean isAttacking() {
         return ctx.players.local().interacting().valid() || (ctx.players.local().interacting().valid() && target != null && target.valid() && target.health() != 0);
-    }
-
-    private boolean inventoryFull() {
-        return ctx.inventory.select().count() == 28;
     }
 
     private void checkIfBeingAttacked() {
@@ -108,13 +102,9 @@ public class AangFighter extends AangScript implements PaintListener, MessageLis
         g.drawLine(ctx.input.getLocation().x, 0, ctx.input.getLocation().x, ctx.input.getLocation().y - 5 );
         g.drawLine(ctx.input.getLocation().x, ctx.input.getLocation().y + 5, ctx.input.getLocation().x, 504 );
 
-        if( targetBone != null && targetBone.valid())
-            g.drawString("boneScreenLocation: " + targetBone.centerPoint(), 5, 144);
+        g.drawString("bone: " + targetBone, 5, 144);
 
         g.drawString("State: " + stateText, 5, 300);
-        if( ctx.menu.opened())
-            g.drawString("Menulocation: " + ctx.menu.bounds().getLocation(), 5, 120);
-        g.drawString("Mousepos: " + ctx.input.getLocation(), 5, 132);
     }
 
     @Override
@@ -125,7 +115,7 @@ public class AangFighter extends AangScript implements PaintListener, MessageLis
             System.out.println("Pray level 43");
         }
 
-        lootIDs = new int[]{buryBones ? bones : 0,combatType == CombatType.ranged ? arrowsUsed : 0};
+        lootIDs = new int[]{buryBones ? bones : 0,combatType == CombatType.ranged ? ammoUsed : 0};
 
         System.out.println("loot ID's: " + lootIDs[1]);
 
@@ -162,7 +152,7 @@ public class AangFighter extends AangScript implements PaintListener, MessageLis
 
 
     @Override
-    public void poll() { //poll time is ~180 ms
+    public void poll() {
         if( state == State.attacking ) {
             if( !ctx.movement.running() && ctx.movement.energyLevel() >= 75) {
                 stateText = "Setting running";
@@ -171,19 +161,24 @@ public class AangFighter extends AangScript implements PaintListener, MessageLis
             stateText = "";
             if( isAttacking() ) {
                 stateText = "Attacking";
+                Item ammo = inventory.getFirst(ammoUsed);
+                if( ammo != null && ammo.valid() ){
+                    inventory.clickItem(ammo);
+                    sleep(100);
+                }
             } else {//TODO find out why it stops picking up arrows after some time
-                if (!inventoryFull() && (targetBone == null || !targetBone.valid() || !misc.pointOnScreen(targetBone.centerPoint())) ) {
+                if (!inventory.full() && (targetBone == null || !targetBone.valid() || !misc.pointOnScreen(targetBone.centerPoint())) ) {
                     targetBone = getNextGroundBone();
                     clickedGroundItem = false;
                 }
-                if (!inventoryFull() && targetBone != null && targetBone.valid() && !inventoryFull() && misc.pointOnScreen(targetBone.centerPoint())) {
+                if (!inventory.full() && targetBone != null && targetBone.valid() && misc.pointOnScreen(targetBone.centerPoint())) {
                     stateText = "Picking up bones";
                     if( !ctx.players.local().inMotion() )
                         clickedGroundItem = false;
                     if (!clickedGroundItem ) {
-                        clickedGroundItem = interact.pickupGroundItem(targetBone);
+                        clickedGroundItem = groundItems.pickup(targetBone);
                     }
-                } else  if( inventoryFull() && ctx.inventory.select().id(bones).first().poll().valid() ) {
+                } else  if( inventory.full() && ctx.inventory.select().id(bones).first().poll().valid() ) {
                     state = State.burying;
                 } else {
                     if( !clickedMonster || !target.valid() || target.health() <= 0 || target.interacting() != ctx.players.local() ) {
@@ -198,15 +193,15 @@ public class AangFighter extends AangScript implements PaintListener, MessageLis
                     } else {
                         stateText = "Attacking monster";
                         if( !clickedMonster )
-                            clickedMonster = interact.attackMonster(target);
+                            clickedMonster = npcs.attackMonster(target);
                     }
                 }
             }
         }else if( state == State.burying){
-            Item invBones = ctx.inventory.select().id(bones).first().poll();
-            if( invBones.valid()) {
+            Item invBones = inventory.getFirst(bones);
+            if( invBones!= null && invBones.valid()) {
                 stateText = "Clicking bones";
-                interact.clickInvItem(invBones);
+                inventory.clickItem(invBones);
             }else {
                 state = State.attacking;
             }
@@ -234,6 +229,9 @@ public class AangFighter extends AangScript implements PaintListener, MessageLis
                 hpLevels++;
             else if (messageEvent.text().equals("Congratulations, you just advanced a Ranged level."))
                 rangeLevels++;
+            else if( messageEvent.text().equals("There is no ammo left in your quiver.")){
+
+            }
         }
 
         if( ctx.skills.realLevel(5) >= 43 ) {

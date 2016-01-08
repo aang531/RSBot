@@ -1,12 +1,11 @@
-package AangUtil;
+package Util;
 
 import org.powerbot.script.rt4.ClientContext;
 import org.powerbot.script.rt4.Component;
 
 import java.util.Arrays;
 
-public class ChatFunc {
-    private ClientContext ctx;
+public class ChatFunc extends AangUtil{
     private static ChatFunc ourInstance = new ChatFunc();
 
     public static ChatFunc getInstance() {
@@ -18,24 +17,19 @@ public class ChatFunc {
     private static final int CHAT_WIDGET_OPTIONS = 219;
     private static final int CHAT_COMPONENT_CONTINUE = 2;
 
-    public void init(ClientContext ctx)
-    {
-        this.ctx = ctx;
-    }
-
     public boolean chatting(){
-        return ctx.widgets.widget(CHAT_WIDGET_OTHER_TALKING).componentCount() > 0
-                || ctx.widgets.widget(CHAT_WIDGET_SELF_TALKING).componentCount() > 0
-                || ctx.widgets.widget(CHAT_WIDGET_OPTIONS).componentCount() > 0;
+        return widgets.widget(CHAT_WIDGET_OTHER_TALKING).componentCount() > 0
+                || widgets.widget(CHAT_WIDGET_SELF_TALKING).componentCount() > 0
+                || widgets.widget(CHAT_WIDGET_OPTIONS).componentCount() > 0;
     }
 
     public boolean isChatOpen(int widgetID, int componentID) {
-        return ctx.widgets.component(widgetID,componentID).valid();
+        return widgets.component(widgetID,componentID).valid();
     }
 
     public boolean canContinue(){
-        return ctx.widgets.component(CHAT_WIDGET_OTHER_TALKING, CHAT_COMPONENT_CONTINUE).valid()
-                || ctx.widgets.component(CHAT_WIDGET_SELF_TALKING, CHAT_COMPONENT_CONTINUE).valid();
+        return widgets.component(CHAT_WIDGET_OTHER_TALKING, CHAT_COMPONENT_CONTINUE).valid()
+                || widgets.component(CHAT_WIDGET_SELF_TALKING, CHAT_COMPONENT_CONTINUE).valid();
     }
 
     public void continueChat(){
@@ -47,12 +41,12 @@ public class ChatFunc {
     }
 
     public String getPendingOptionsQuestion() {
-        return ctx.widgets.component(CHAT_WIDGET_OPTIONS,0).components()[0].text();
+        return widgets.component(CHAT_WIDGET_OPTIONS,0).components()[0].text();
     }
 
     public Component[] getPendingOptions() {
         Component[] components = ctx.widgets.component(CHAT_WIDGET_OPTIONS,0).components();
-        if( components.length == 0 )
+        if( components.length <= 2 )
             return null;
         return Arrays.copyOfRange(components,1,components.length-2);
     }
@@ -62,6 +56,7 @@ public class ChatFunc {
     }
 
     public boolean pendingInput() {
-        return ctx.widgets.component(162, 32).visible();
+        Component c = widgets.component(162, 32);
+        return c != null && c.visible();
     }
 }

@@ -35,12 +35,12 @@ public class AreaMaker extends PollingScript<ClientContext> implements PaintList
             tiles.toArray(t);
             Area a = new Area(t);
             for(int i = 0; i < a.getPolygon().npoints; i++ ){
-                Point p = new Point(tiles.get(i).matrix(ctx).getBounds().xpoints[0],tiles.get(i).matrix(ctx).getBounds().ypoints[0]);
+                Point p = new Point(tiles.get(i).matrix(ctx).bounds().xpoints[0],tiles.get(i).matrix(ctx).bounds().ypoints[0]);
                 Point pp;
                 if( i == a.getPolygon().npoints - 1)
-                    pp = new Point(tiles.get(0).matrix(ctx).getBounds().xpoints[0],tiles.get(0).matrix(ctx).getBounds().ypoints[0]);
+                    pp = new Point(tiles.get(0).matrix(ctx).bounds().xpoints[0],tiles.get(0).matrix(ctx).bounds().ypoints[0]);
                 else
-                    pp = new Point(tiles.get(i+1).matrix(ctx).getBounds().xpoints[0],tiles.get(i+1).matrix(ctx).getBounds().ypoints[0]);
+                    pp = new Point(tiles.get(i+1).matrix(ctx).bounds().xpoints[0],tiles.get(i+1).matrix(ctx).bounds().ypoints[0]);
                 g.drawLine(p.x,p.y,pp.x,pp.y);
             }
             g.drawPolygon(a.getPolygon());
@@ -50,17 +50,17 @@ public class AreaMaker extends PollingScript<ClientContext> implements PaintList
             }else {
                 g.setColor(new Color(255, 0, 0, 100));
             }
-            g.fillPolygon(ctx.players.local().tile().matrix(ctx).getBounds());
+            g.fillPolygon(ctx.players.local().tile().matrix(ctx).bounds());
         }else{
             g.setColor(new Color(255,0,0,100));
-            g.fillPolygon(ctx.players.local().tile().matrix(ctx).getBounds());
+            g.fillPolygon(ctx.players.local().tile().matrix(ctx).bounds());
         }
         for( int i = 0; i < tiles.size(); i++ ) {
             if( i == gui.tileList.getSelectedIndex() )
                 g.setColor(Color.yellow);
             else
                 g.setColor(new Color(0,0,255,150));
-            g.fillPolygon(tiles.get(i).matrix(ctx).getBounds());
+            g.fillPolygon(tiles.get(i).matrix(ctx).bounds());
         }
     }
 

@@ -1,6 +1,6 @@
 package BoundsTool;
 
-import AangUtil.AangScript;
+import Util.AangScript;
 import org.powerbot.script.*;
 import org.powerbot.script.rt4.GameObject;
 
@@ -8,16 +8,34 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
-@Script.Manifest(name = "BoundsTool", description = "Tool to edit bounds of objects and such.", properties="client=4")
+@Script.Manifest(name = "BoundsTool", description = "Tool to edit bounds of objects and such.", properties="client=4;author=aang521")
 public class BoundsTool extends AangScript implements MouseListener {
 
     public GameObject selectedModel;
+
+    private GUI gui;
+
+    public int minx,miny,minz,maxx,maxy,maxz;
+
+    public boolean selecting = false;
+
+    @Override
+    public void start(){
+        gui = new GUI(this);
+    }
+
+    @Override
+    public void stop(){
+        gui.dispose();
+    }
 
     @Override
     public void repaint(Graphics g) {
         if( selectedModel != null && selectedModel.valid() ) {
             g.drawString(""+selectedModel, 5, 100);
             selectedModel.draw(g,255);
+        }else{
+            g.drawString("NONE", 5, 100);
         }
     }
 
@@ -28,32 +46,38 @@ public class BoundsTool extends AangScript implements MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        final Point mousePos =  e.getLocationOnScreen();
-        System.out.println(mousePos );
-        /*selectedModel = ctx.objects.select().within(100.0).select(new Filter<GameObject>() {
-            @Override
-            public boolean accept(GameObject gameObject) {
-                return gameObject.contains(mousePos);
-            }
-        }).poll();
-        System.out.println("" + selectedModel);*/
-        //Area a = new Area(ctx.players.local().tile().derive(-10,-10), ctx.players.local().tile().derive(10,10));
-        Tile playerTile = ctx.players.local().tile();
-        loops:
-        for( int y = -10; y <= 10 ; y++ )
-            for( int x = -10; x <= 10; x++ ){
-                if( playerTile.derive(x,y).matrix(ctx).getBounds().contains(mousePos)) {//TODO finds wrong tile
-                    final Tile foundTile = playerTile.derive(x,y);
-                    System.out.println("found tile " + foundTile);
-                    selectedModel = ctx.objects.select().select(new Filter<GameObject>() {
-                        @Override
-                        public boolean accept(GameObject gameObject) {
-                            return gameObject.tile().x() == foundTile.x() && gameObject.tile().y() == foundTile.y();
-                        }
-                    }).poll();
-                    break loops;
+        if( selecting ) {
+            final Point mousePos = e.getPoint();
+            System.out.println(mousePos);
+
+            Tile playerTile = ctx.players.local().tile();
+            loops:
+            for (int y = -10; y <= 10; y++)
+                for (int x = -10; x <= 10; x++) {
+                    if (playerTile.derive(x, y).matrix(ctx).bounds().contains(mousePos)) {
+                        final Tile foundTile = playerTile.derive(x, y);
+                        System.out.println("found tile " + x + " " + y);
+                        selectedModel = ctx.objects.select().select(new Filter<GameObject>() {
+                            @Override
+                            public boolean accept(GameObject gameObject) {
+                                return gameObject.type() != GameObject.Type.FLOOR_DECORATION && gameObject.type() != GameObject.Type.WALL_DECORATION &&
+                                        gameObject.tile().x() == foundTile.x() && gameObject.tile().y() == foundTile.y();
+                            }
+                        }).poll();
+
+                        minx = -32;
+                        miny = -64;
+                        minz = -32;
+                        maxx = 32;
+                        maxy = 0;
+                        maxz = 32;
+                        updateBounds();
+
+                        selecting = false;
+                        break loops;
+                    }
                 }
-            }
+        }
     }
 
     @Override
@@ -74,5 +98,39 @@ public class BoundsTool extends AangScript implements MouseListener {
     @Override
     public void mouseExited(MouseEvent e) {
 
+    }
+
+    public void exit()
+    {
+        ctx.controller.stop();
+    }
+
+    public void changeMinx(int newValue){
+        minx = newValue;
+        updateBounds();
+    }
+    public void changeMiny(int newValue){
+        miny = newValue;
+        updateBounds();
+    }
+    public void changeMinz(int newValue){
+        minz = newValue;
+        updateBounds();
+    }
+    public void changeMaxx(int newValue){
+        maxx = newValue;
+        updateBounds();
+    }
+    public void changeMaxy(int newValue){
+        maxy = newValue;
+        updateBounds();
+    }
+    public void changeMaxz(int newValue){
+        maxz = newValue;
+        updateBounds();
+    }
+    private void updateBounds(){
+        selectedModel.bounds(minx,maxx,miny,maxy,minz,maxz);
+        gui.updateValues();
     }
 }
