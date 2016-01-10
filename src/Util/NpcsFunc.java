@@ -34,11 +34,13 @@ public class NpcsFunc extends AangUtil {
     }
 
     public boolean attackMonster( final Npc npc ) {
-        while( npc.valid() && misc.pointOnScreen(npc.centerPoint())){
+        return interact.clickInteractable(npc, "Attack",npc.name() + "  (level-" + npc.combatLevel() + ")");
+        /*while( npc.valid() && misc.pointOnScreen(npc.centerPoint())){
             int index = misc.getMenuOptionIndex("Attack",npc.name() + "  (level-" + npc.combatLevel() + ")");
             if( !ctx.menu.opened()) {
-                ctx.input.hop(npc.centerPoint());
-                sleep(50);
+                //ctx.input.hop(npc.centerPoint());
+                ctx.input.hop(npc.nextPoint());
+                sleep(80);
                 index = misc.getMenuOptionIndex("Attack",npc.name() + "  (level-" + npc.combatLevel() + ")");
                 if( index == 0 ){
                     return ctx.input.click(true);
@@ -53,7 +55,7 @@ public class NpcsFunc extends AangUtil {
                 return false;
             }
         }
-        return false;
+        return false;*/
     }
 
     public boolean click( final Npc npc, String action ) {

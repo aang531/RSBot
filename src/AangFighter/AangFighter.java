@@ -21,7 +21,7 @@ public class AangFighter extends AangScript implements PaintListener, MessageLis
 
     private int prayerLevels = 0, attackLevels = 0, strengthLevels = 0, defenseLevels = 0, hpLevels = 0, rangeLevels = 0;
 
-    private final int[] monsterIDs = Monster.chickens.ids;//Monster.cows.ids;
+    private final int[] monsterIDs = Monster.cows.ids;
     private List<Integer> itemsToLoot = new ArrayList<Integer>();
     private int[] lootIDs;
     private final int bones = 526;
@@ -31,7 +31,7 @@ public class AangFighter extends AangScript implements PaintListener, MessageLis
     private boolean buryBones = true;
     private boolean clickedGroundItem = false, clickedMonster = false;
     private String stateText = "";
-    private CombatType combatType = CombatType.ranged;
+    private CombatType combatType = CombatType.melee;
 
     private static int bronzeArrow, ironArrow, steelArrow, mithArrow = 888, addyArrow, runeArrow;
     private int ammoUsed = mithArrow;
@@ -77,7 +77,7 @@ public class AangFighter extends AangScript implements PaintListener, MessageLis
         return ctx.groundItems.select().id(lootIDs).select(new Filter<GroundItem>() {
             @Override
             public boolean accept(GroundItem groundItem) {
-                return misc.pointOnScreen(groundItem.centerPoint());
+                return misc.pointOnScreen(groundItem.centerPoint()) && groundItem.tile().matrix(ctx).reachable();
             }
         }).nearest().poll();
     }

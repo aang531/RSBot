@@ -1,5 +1,6 @@
 package Util;
 
+import org.powerbot.script.MenuCommand;
 import org.powerbot.script.Tile;
 import org.powerbot.script.rt4.Component;
 
@@ -42,8 +43,9 @@ public class MiscFunc extends AangUtil {
     }
 
     public int getMenuOptionIndex(String action, String option){
-        for( int i = 0; ctx.menu.commands().length > i; i++ ){
-            if( ctx.menu.commands()[i].action.equals(action) && ctx.menu.commands()[i].option.equals(option) ){
+        MenuCommand[] commands = ctx.menu.commands();
+        for( int i = 0; commands.length > i; i++ ){
+            if( commands[i].action.equals(action) && commands[i].option.equals(option) ){
                 return i;
             }
         }

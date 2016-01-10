@@ -4,6 +4,7 @@ import Util.AangScript;
 import Util.Movement.Obstacle;
 import Util.Movement.Path;
 import Util.Movement.TileArea;
+import Util.WorldFunc;
 import org.powerbot.script.PaintListener;
 import org.powerbot.script.Script;
 import org.powerbot.script.Tile;
@@ -17,7 +18,6 @@ public class AangRobes extends AangScript implements PaintListener {
 
     private static final int robeTopID = 544, robeBottomID = 542;
     private int robeTopPrice,robeBottomPrice;
-    private static final int pickupAnim = 832;
 
     private static final Path toRobes = new Path( new Tile[] {  new Tile(3094,3494), new Tile(3093,3498), new Tile(3089,3501),
             new Tile(3083,3504), new Tile(3077,3504), new Tile(3075,3510), new Tile(3075,3515),
@@ -123,6 +123,8 @@ public class AangRobes extends AangScript implements PaintListener {
         worlds.openWorldHop();
         if(!worlds.sortedOnMembers())
             worlds.sortOnMembers();
+
+        ctx.properties.put("login.disable", "true");
     }
 
     public void stop(){
@@ -178,20 +180,24 @@ public class AangRobes extends AangScript implements PaintListener {
                         groundItems.pickup(robeBottom);
                         sleep(400);
                     }else if(System.currentTimeMillis() > hopDelay + lastHopTime ) {
+
+                        if(!worlds.sortedOnMembers())
+                            worlds.sortOnMembers();
+
                         int currentWorld = worlds.getCurrentWorld();
                         int currentIndex = -1;
-                        for (int i = 0; i < worlds.freeWorlds.length; i++) {
-                            if (worlds.freeWorlds[i] == currentWorld) {
+                        for (int i = 0; i < WorldFunc.freeWorlds.length; i++) {
+                            if (WorldFunc.freeWorlds[i] == currentWorld) {
                                 currentIndex = i;
                                 break;
                             }
                         }
-                        if (currentIndex == worlds.freeWorlds.length - 1) {
-                            worlds.hop(worlds.freeWorlds[0]);
+                        if (currentIndex == WorldFunc.freeWorlds.length - 1) {
+                            worlds.hop(WorldFunc.freeWorlds[0]);
                             lastHopTime = System.currentTimeMillis();
                             sleep(200);
                         }else {
-                            worlds.hop(worlds.freeWorlds[currentIndex + 1]);
+                            worlds.hop(WorldFunc.freeWorlds[currentIndex + 1]);
                             lastHopTime = System.currentTimeMillis();
                             sleep(200);
                         }

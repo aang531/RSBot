@@ -22,6 +22,7 @@ public abstract class AangScript extends PollingScript<ClientContext> implements
     public final MenuFunc menu;
     public final GameFunc game;
     public final CameraFunc camera;
+    public final InteractFunc interact;
 
     public AangScript() {
         super();
@@ -40,6 +41,7 @@ public abstract class AangScript extends PollingScript<ClientContext> implements
         menu = MenuFunc.getInstance();
         game = GameFunc.getInstance();
         camera = CameraFunc.getInstance();
+        interact = InteractFunc.getInstance();
 
         AangUtil.init(ctx);
     }

@@ -9,7 +9,7 @@ public class Path {
     Tile[] tilePath;
     Obstacle[] obstacles;
 
-    int lastIndex = Integer.MAX_VALUE;
+    int lastIndex = Integer.MAX_VALUE - 3;
 
     public Path(Tile[] tilePath, Obstacle[] obstacles){
         this.tilePath = tilePath;
@@ -38,7 +38,7 @@ public class Path {
                 }
             }
         }
-        for( int i = tilePath.length-1; i >= Math.min(lastIndex + 2,tilePath.length - 1); i-- ){
+        for( int i = tilePath.length-1; i >= Math.min(lastIndex + 2,tilePath.length - 1) && i >= 0; i-- ){
             if( AangUtil.movement.tileOnMap(tilePath[i]) && tilePath[i].matrix(AangUtil.ctx).reachable()){
                 lastIndex = i;
                 if( (AangUtil.ctx.movement.destination().distanceTo(tilePath[i]) > 2 || !AangUtil.ctx.players.local().inMotion()) && AangUtil.ctx.players.local().tile().distanceTo(tilePath[i]) > 0 ) {

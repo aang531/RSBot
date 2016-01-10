@@ -25,6 +25,7 @@ public class AangUtil {
     public static final GameFunc game = GameFunc.getInstance();
     public static final CameraFunc camera = CameraFunc.getInstance();
     public static final ChatFunc chat = ChatFunc.getInstance();
+    public static final InteractFunc interact = InteractFunc.getInstance();
 
     public static void sleep( int millis ){
         AangScript.sleep(millis);
