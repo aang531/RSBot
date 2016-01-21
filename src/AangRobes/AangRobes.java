@@ -43,7 +43,7 @@ public class AangRobes extends AangScript implements PaintListener {
     private int robeBottomInInv = 0, robeBottomGained = 0;
     private long startTime;
 
-    private static final int hopDelay = 24000;
+    private static final int hopDelay = 23000;
     private long lastHopTime = 0;
 
     private boolean clickedExsistingUser = false;
@@ -234,5 +234,8 @@ public class AangRobes extends AangScript implements PaintListener {
         g.drawString("Time Running " + hours + ":" + mins + ":" + seconds, 5, 288);
         g.drawString("Profit: " + profit, 5, 300);
         g.drawString("Robes gained: " + (robeTopGained+robeBottomGained), 5, 312);
+
+        g.drawString("getLoginState "+ctx.client().getLoginState(),5,100);
+        g.drawString("getLoginField "+ctx.client().getLoginField(),5,120);
     }
 }

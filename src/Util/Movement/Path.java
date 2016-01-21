@@ -2,6 +2,7 @@ package Util.Movement;
 
 import Util.AangUtil;
 import org.powerbot.script.Condition;
+import org.powerbot.script.Random;
 import org.powerbot.script.Tile;
 
 public class Path {
@@ -22,6 +23,11 @@ public class Path {
     }
 
     public boolean traverse(){
+        if( !AangUtil.movement.running() && AangUtil.movement.energy() >= AangUtil.movement.nextRunPercent ){
+            if( AangUtil.movement.setRunning() )
+                AangUtil.movement.nextRunPercent = Random.nextInt(50,80);
+        }
+
         for (Obstacle obstacle : obstacles) {
             if (obstacle.check())
                 return true;

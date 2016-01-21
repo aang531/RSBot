@@ -79,18 +79,18 @@ public class InventoryFunc extends AangUtil {
             clickItem(selectedItem());
         }else{
             ctx.input.hop(530,150);
-            Condition.sleep(50);
+            sleep(50);
             ctx.input.click(true);
         }
     }
 
     public boolean clickItem( Item item, String action ){
         while( item != null ) {
-            int index = MiscFunc.getInstance().getMenuOptionIndex(action, item.name());
+            int index = menu.getIndex(action, item.name());
             if( !ctx.menu.opened()) {
                 ctx.input.hop(item.centerPoint());
-                Condition.sleep(50);
-                index = MiscFunc.getInstance().getMenuOptionIndex(action, item.name());
+                sleep(50);
+                index = menu.getIndex(action, item.name());
                 if( index == 0)
                     return ctx.input.click(true);
                 else
@@ -113,7 +113,7 @@ public class InventoryFunc extends AangUtil {
     public boolean clickItem( final Item item) {
         if( item != null ) {
             ctx.input.hop(item.centerPoint());
-            Condition.sleep(50);
+            sleep(50);
             if( ctx.menu.commands()[0].option.equals(item.name()))
                 return ctx.input.click(true);
         }

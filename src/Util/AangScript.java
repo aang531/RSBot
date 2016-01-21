@@ -23,6 +23,7 @@ public abstract class AangScript extends PollingScript<ClientContext> implements
     public final GameFunc game;
     public final CameraFunc camera;
     public final InteractFunc interact;
+    public final SkillsFunc skills;
 
     public AangScript() {
         super();
@@ -42,6 +43,7 @@ public abstract class AangScript extends PollingScript<ClientContext> implements
         game = GameFunc.getInstance();
         camera = CameraFunc.getInstance();
         interact = InteractFunc.getInstance();
+        skills = SkillsFunc.getInstance();
 
         AangUtil.init(ctx);
     }

@@ -28,7 +28,7 @@ public class AangFighter extends AangScript implements PaintListener, MessageLis
     private Npc target;
     private GroundItem targetBone;
     private State state = State.attacking;
-    private boolean buryBones = true;
+    private boolean buryBones = false;
     private boolean clickedGroundItem = false, clickedMonster = false;
     private String stateText = "";
     private CombatType combatType = CombatType.melee;
@@ -40,10 +40,20 @@ public class AangFighter extends AangScript implements PaintListener, MessageLis
         return ctx.players.local().interacting().valid() || (ctx.players.local().interacting().valid() && target != null && target.valid() && target.health() != 0);
     }
 
+    private boolean inCombat(){
+        if((ctx.players.local().interacting().valid() && ctx.players.local().interacting().health() != 0))
+            return true;
+        for( Npc npc : ctx.npcs.get() )
+            if( npc.combatLevel() > 0 && npc.health() != 0 && npc.interacting().valid() && npc.interacting().name().equals(ctx.players.local().name())) {
+                return true;
+            }
+        return false;
+    }
+
     private void checkIfBeingAttacked() {
         if(ctx.players.local().inCombat() && !ctx.players.local().interacting().valid()) {
             for (Npc npc : ctx.npcs.get() ) {
-                if( npc.interacting().valid()) {
+                if( npc.combatLevel() > 0 && npc.interacting().valid()) {
                     if( npc.interacting().name().equals(ctx.players.local().name()) ) {
                         if( target != npc )
                             npc.interact("Attack", npc.name());
@@ -88,6 +98,7 @@ public class AangFighter extends AangScript implements PaintListener, MessageLis
 
     @Override
     public void repaint(Graphics g) {
+        super.repaint(g);
 
         if(target != null && target.valid()) {
             target.draw(g, 100);
@@ -97,12 +108,6 @@ public class AangFighter extends AangScript implements PaintListener, MessageLis
         }
 
         g.setColor(Color.white);
-        g.drawLine(0,ctx.input.getLocation().y, ctx.input.getLocation().x - 5,ctx.input.getLocation().y );
-        g.drawLine(ctx.input.getLocation().x + 5,ctx.input.getLocation().y, 765,ctx.input.getLocation().y );
-        g.drawLine(ctx.input.getLocation().x, 0, ctx.input.getLocation().x, ctx.input.getLocation().y - 5 );
-        g.drawLine(ctx.input.getLocation().x, ctx.input.getLocation().y + 5, ctx.input.getLocation().x, 504 );
-
-        g.drawString("bone: " + targetBone, 5, 144);
 
         g.drawString("State: " + stateText, 5, 300);
     }
@@ -116,8 +121,6 @@ public class AangFighter extends AangScript implements PaintListener, MessageLis
         }
 
         lootIDs = new int[]{buryBones ? bones : 0,combatType == CombatType.ranged ? ammoUsed : 0};
-
-        System.out.println("loot ID's: " + lootIDs[1]);
 
         while( ctx.game.tab() != Game.Tab.INVENTORY ) {
             misc.openInventory();
@@ -178,7 +181,7 @@ public class AangFighter extends AangScript implements PaintListener, MessageLis
                     if (!clickedGroundItem ) {
                         clickedGroundItem = groundItems.pickup(targetBone);
                     }
-                } else  if( inventory.full() && ctx.inventory.select().id(bones).first().poll().valid() ) {
+                } else  if( inventory.full() && inventory.contains(bones) ) {
                     state = State.burying;
                 } else {
                     if( !clickedMonster || !target.valid() || target.health() <= 0 || target.interacting() != ctx.players.local() ) {
@@ -188,12 +191,13 @@ public class AangFighter extends AangScript implements PaintListener, MessageLis
                     if (!misc.pointOnScreen(target.centerPoint())) {
                         if (target.tile().matrix(ctx).onMap()) {
                             stateText = "Walking to monster";
-                            ctx.input.click(target.tile().matrix(ctx).mapPoint(), true);
+                            movement.walkTile(target.tile());
                         }
                     } else {
                         stateText = "Attacking monster";
-                        if( !clickedMonster )
+                        if( !clickedMonster ) {
                             clickedMonster = npcs.attackMonster(target);
+                        }
                     }
                 }
             }

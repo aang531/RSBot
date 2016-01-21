@@ -1,6 +1,9 @@
 package Util;
 
+import org.powerbot.script.Condition;
 import org.powerbot.script.rt4.Component;
+
+import java.util.concurrent.Callable;
 
 public class BankFunc extends AangUtil {
     private static BankFunc ourInstance = new BankFunc();
@@ -33,18 +36,46 @@ public class BankFunc extends AangUtil {
         return widgets.clickComponent(WIDGET_BANK,COMPONENT_DEPOSIT_ARMOR);
     }
 
-    public boolean withdrawX(int id, int amount){
-        Component c = getItemComponent(id);//TODO make sure item is on screen
+    public boolean withdraw(int id, int amount){
+        final Component c = getItemComponent(id);
         if( c == null )
             return false;
-        while( !ChatFunc.getInstance().pendingInput() ) {
-            widgets.clickComponentItem(c, "Withdraw-X");
-            sleep(400);
+        final Component itemWindow = widgets.component(WIDGET_BANK,COMPONENT_ITEMS);
+        if(c.screenPoint().y < itemWindow.screenPoint().y || c.screenPoint().y + c.height() > itemWindow.screenPoint().y + itemWindow.height() ) {
+            ctx.input.hop(itemWindow.centerPoint());
+            while (c.screenPoint().y < itemWindow.screenPoint().y || c.screenPoint().y + c.height() > itemWindow.screenPoint().y + itemWindow.height()) {
+                if (c.screenPoint().y < itemWindow.screenPoint().y)
+                    ctx.input.scroll(false);
+                else
+                    ctx.input.scroll(true);
+            }
         }
-        if( ChatFunc.getInstance().pendingInput() ){
-            ctx.input.sendln(""+amount);
-            return true;
-        }
+
+        if( amount == 1 || amount == 5 || amount == 10)
+            return widgets.clickComponentItem(c,"Withdraw-"+amount);
+
+        ctx.input.hop(c.centerPoint());
+        sleep(80);
+        ctx.input.click(false);
+        sleep(80);
+        final int index = menu.getActionIndex("Withdraw-"+amount);
+        if( index == -1 ) {
+            if( !widgets.clickComponentItem(c, "Withdraw-X") )
+                return false;
+            Condition.wait(new Callable<Boolean>() {
+                @Override
+                public Boolean call() throws Exception {
+                    return ChatFunc.getInstance().pendingInput();
+                }
+            },100);
+            if( ChatFunc.getInstance().pendingInput() ){
+                ctx.input.sendln(""+amount);
+                sleep(80);
+                return true;
+            }
+        } else
+            return menu.clickMenuOption(index);
+
         return false;
     }
 

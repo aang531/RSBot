@@ -2,8 +2,8 @@ package Util.Movement;
 
 import Util.AangUtil;
 import org.powerbot.script.Condition;
+import org.powerbot.script.Random;
 import org.powerbot.script.Tile;
-import org.powerbot.script.rt4.ClientContext;
 
 import java.awt.*;
 
@@ -14,6 +14,8 @@ public class MovementFunc extends AangUtil {
         return ourInstance;
     }
 
+    public int nextRunPercent = Random.nextInt(50,80);
+
     public int energy() {
         return ctx.movement.energyLevel();
     }
@@ -22,20 +24,19 @@ public class MovementFunc extends AangUtil {
         return ctx.movement.running();
     }
 
-    public void setRunning() {
-        if( !running() ) {
-            ctx.input.hop(ctx.widgets.component(160, 22).centerPoint());
-            Condition.sleep(50);
-            ctx.input.click(true);
-        }
+    public boolean setRunning() {
+        return setRunning(true);
     }
 
-    public void setRunning(boolean running) {
+    public boolean setRunning(boolean running) {
         if( running() != running ) {
             ctx.input.hop(ctx.widgets.component(160, 22).centerPoint());
-            Condition.sleep(50);
+            sleep(80);
             ctx.input.click(true);
+            sleep(80);
+            return running() == running;
         }
+        return true;
     }
 
     public boolean tileOnMap(Tile t){
@@ -57,7 +58,7 @@ public class MovementFunc extends AangUtil {
             ctx.input.hop(t.matrix(ctx).centerPoint());
             Condition.sleep(50);
             //t.matrix(ctx).click("Walk here");
-            int index = misc.getMenuOptionIndex("Walk here","");
+            int index = menu.getIndex("Walk here","");
             if( index == 0 )
                 ctx.input.click(true);
             else{

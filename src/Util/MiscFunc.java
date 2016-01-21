@@ -42,16 +42,6 @@ public class MiscFunc extends AangUtil {
         return p.x > 3 && p.y > 3 && p.x < 516 && p.y < 338;
     }
 
-    public int getMenuOptionIndex(String action, String option){
-        MenuCommand[] commands = ctx.menu.commands();
-        for( int i = 0; commands.length > i; i++ ){
-            if( commands[i].action.equals(action) && commands[i].option.equals(option) ){
-                return i;
-            }
-        }
-        return -1;
-    }
-
     public Tile getTileUnderPoint(Point p){
         Tile playerTile = ctx.players.local().tile();
         for (int y = -10; y <= 10; y++)

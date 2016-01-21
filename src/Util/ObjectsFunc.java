@@ -59,49 +59,11 @@ public class ObjectsFunc extends AangUtil {
     }
 
     public boolean click(GameObject obj, String action ) {
-        while( obj != null && obj.valid() && misc.pointOnScreen(obj.centerPoint())){
-            int index = misc.getMenuOptionIndex(action,obj.name());
-            if( !ctx.menu.opened()) {
-                ctx.input.hop(obj.centerPoint());
-                sleep(100);
-                index = misc.getMenuOptionIndex(action,obj.name());
-                if( index == 0 ){
-                    return ctx.input.click(true);
-                }else{
-                    ctx.input.click(false);
-                }
-            }else{
-                if( index != -1)
-                    return menu.clickMenuOption(index);
-                else
-                    ctx.menu.close();
-                return false;
-            }
-        }
-        return false;
+        return interact.clickInteractableCC(obj, action,obj.name());
     }
 
     public boolean useItem( GameObject obj ) {
-        while( obj.valid() && misc.pointOnScreen(obj.centerPoint())){
-            int index = MiscFunc.getInstance().getMenuOptionIndex("Use", inventory.selectedItem().name() + " -> " + obj.name());
-            if( !ctx.menu.opened()) {
-                ctx.input.hop(obj.centerPoint());
-                sleep(60);
-                index = MiscFunc.getInstance().getMenuOptionIndex("Use", inventory.selectedItem().name() + " -> " + obj.name());
-                if( index == 0 ){
-                    return ctx.input.click(true);
-                }else{
-                    ctx.input.click(false);
-                }
-            }else{
-                if( index != -1)
-                    return menu.clickMenuOption(index);
-                else
-                    ctx.menu.close();
-                return false;
-            }
-        }
-        return false;
+        return interact.clickInteractableCC(obj, "Use",inventory.selectedItem().name() + " -> " + obj.name());
     }
 
 }

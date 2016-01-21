@@ -70,11 +70,11 @@ public class WidgetFunc extends AangUtil {
     public boolean clickComponentItem(Component c, String action ){
         while( c != null && c.valid() && misc.pointOnScreen(c.centerPoint())){
             Item i = new Item(ctx, c, c.itemId(), c.itemStackSize());
-            int index = misc.getMenuOptionIndex(action,i.name());
+            int index = menu.getIndex(action,i.name());
             if( !ctx.menu.opened()) {
                 ctx.input.hop(c.centerPoint());
                 sleep(100);
-                index = misc.getMenuOptionIndex(action,i.name());
+                index = menu.getIndex(action,i.name());
                 if( index == 0 ){
                     return ctx.input.click(true);
                 }else{

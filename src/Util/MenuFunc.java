@@ -1,6 +1,7 @@
 package Util;
 
 import org.powerbot.bot.rt4.client.Client;
+import org.powerbot.script.MenuCommand;
 
 import java.awt.*;
 
@@ -19,6 +20,34 @@ public class MenuFunc extends AangUtil {
             return ctx.input.click(true);
         }
         return false;
+    }
+
+    private String[] actions(){
+        return ctx.client().getMenuActions();
+    }
+
+    private int count(){
+        return ctx.client().getMenuCount()/15;
+    }
+
+    public int getActionIndex(String action){
+        final String[] actions = actions();
+        final int count = count();
+        for( int i = 0; i < count; i++ ) {
+            if (actions[i].equals(action))
+                return count-i-1;
+        }
+        return -1;
+    }
+
+    public int getIndex(String action, String option){
+        final MenuCommand[] commands = ctx.menu.commands();
+        for( int i = 0; commands.length > i; i++ ){
+            if( commands[i].action.equals(action) && commands[i].option.equals(option) ){
+                return i;
+            }
+        }
+        return -1;
     }
 
     public Rectangle bounds(){

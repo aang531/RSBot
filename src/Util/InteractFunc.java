@@ -1,6 +1,6 @@
 package Util;
 
-import org.powerbot.script.rt4.Actor;
+import org.powerbot.script.rt4.Interactive;
 
 import java.awt.*;
 
@@ -11,7 +11,7 @@ public class InteractFunc extends AangUtil {
         return ourInstance;
     }
 
-    public boolean clickInteractable( Actor obj, String action, String option ){
+    public boolean clickInteractableCC(Interactive obj, String action, String option ){
         int tries = 0;
         Point p = obj.nextPoint();
         while( tries < 5 && obj.valid()){
@@ -23,7 +23,7 @@ public class InteractFunc extends AangUtil {
             if( !menu.opened()) {
                 ctx.input.hop(p);
                 sleep(80);
-                final int index = misc.getMenuOptionIndex(action,option);
+                final int index = menu.getIndex(action,option);
                 if( index == 0 ){
                     ctx.input.click(true);
                     sleep(80);
@@ -33,7 +33,7 @@ public class InteractFunc extends AangUtil {
                     sleep(80);
                 }
             }else{
-                final int index = misc.getMenuOptionIndex(action,option);
+                final int index = menu.getIndex(action,option);
                 if( index != -1) {
                     menu.clickMenuOption(index);
                     sleep(80);
@@ -49,13 +49,13 @@ public class InteractFunc extends AangUtil {
         return false;
     }
 
-    public boolean clickInteractableCenter( Actor obj, String action, String option ){
+    public boolean clickInteractableCenterCC( Interactive obj, String action, String option ){
         int tries = 0;
         while( tries < 5 && obj.valid() && misc.pointOnScreen(obj.centerPoint())){
             if( !menu.opened()) {
                 ctx.input.hop(obj.centerPoint());
                 sleep(80);
-                final int index = misc.getMenuOptionIndex(action,option);
+                final int index = menu.getIndex(action,option);
                 if( index == 0 ){
                     ctx.input.click(true);
                     sleep(80);
@@ -65,7 +65,7 @@ public class InteractFunc extends AangUtil {
                     sleep(80);
                 }
             }else{
-                final int index = misc.getMenuOptionIndex(action,option);
+                final int index = menu.getIndex(action,option);
                 if( index != -1) {
                     menu.clickMenuOption(index);
                     sleep(80);

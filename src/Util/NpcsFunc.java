@@ -34,73 +34,14 @@ public class NpcsFunc extends AangUtil {
     }
 
     public boolean attackMonster( final Npc npc ) {
-        return interact.clickInteractable(npc, "Attack",npc.name() + "  (level-" + npc.combatLevel() + ")");
-        /*while( npc.valid() && misc.pointOnScreen(npc.centerPoint())){
-            int index = misc.getMenuOptionIndex("Attack",npc.name() + "  (level-" + npc.combatLevel() + ")");
-            if( !ctx.menu.opened()) {
-                //ctx.input.hop(npc.centerPoint());
-                ctx.input.hop(npc.nextPoint());
-                sleep(80);
-                index = misc.getMenuOptionIndex("Attack",npc.name() + "  (level-" + npc.combatLevel() + ")");
-                if( index == 0 ){
-                    return ctx.input.click(true);
-                }else{
-                    ctx.input.click(false);
-                }
-            }else{
-                if( index != -1)
-                    return menu.clickMenuOption(index);
-                else
-                    ctx.menu.close();
-                return false;
-            }
-        }
-        return false;*/
+        return interact.clickInteractableCC(npc, "Attack",npc.name() + "  (level-" + npc.combatLevel() + ")");
     }
 
     public boolean click( final Npc npc, String action ) {
-        while( npc.valid() && misc.pointOnScreen(npc.centerPoint())){
-            int index = misc.getMenuOptionIndex(action,npc.name() + (npc.combatLevel() != 0 ? "  (level-" + npc.combatLevel() + ")" : ""));
-            if( !ctx.menu.opened()) {
-                ctx.input.hop(npc.centerPoint());
-                sleep(50);
-                index = misc.getMenuOptionIndex(action,npc.name() + (npc.combatLevel() != 0 ? "  (level-" + npc.combatLevel() + ")" : ""));
-                if( index == 0 ){
-                    return ctx.input.click(true);
-                }else{
-                    ctx.input.click(false);
-                }
-            }else{
-                if( index != -1)
-                    return menu.clickMenuOption(index);
-                else
-                    ctx.menu.close();
-                return false;
-            }
-        }
-        return false;
+        return interact.clickInteractableCC(npc, action,npc.name() + (npc.combatLevel() != 0 ? "  (level-" + npc.combatLevel() + ")" : ""));
     }
 
     public boolean useItem( final Npc npc) {
-        while( npc.valid() && misc.pointOnScreen(npc.centerPoint())){
-            int index = misc.getMenuOptionIndex("Use", inventory.selectedItem().name() + " -> " + npc.name() + (npc.combatLevel() != 0 ? "  (level-" + npc.combatLevel() + ")" : ""));
-            if( !ctx.menu.opened()) {
-                ctx.input.hop(npc.centerPoint());
-                sleep(60);
-                index = misc.getMenuOptionIndex("Use", inventory.selectedItem().name() + " -> " + npc.name() + (npc.combatLevel() != 0 ? "  (level-" + npc.combatLevel() + ")" : ""));
-                if( index == 0 ){
-                    return ctx.input.click(true);
-                }else{
-                    ctx.input.click(false);
-                }
-            }else{
-                if( index != -1)
-                    return menu.clickMenuOption(index);
-                else
-                    ctx.menu.close();
-                return false;
-            }
-        }
-        return false;
+        return interact.clickInteractableCC(npc, "Use",inventory.selectedItem().name() + " -> " + npc.name() + (npc.combatLevel() != 0 ? "  (level-" + npc.combatLevel() + ")" : ""));
     }
 }
